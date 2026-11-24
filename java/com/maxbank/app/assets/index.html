@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MaxmudBank</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #0f172a; color: #f8fafc; padding: 16px; }
+    .app { max-width: 440px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .logo { font-size: 20px; font-weight: 700; color: #38bdf8; }
+    .badge { font-size: 12px; background: #1e293b; padding: 4px 10px; border-radius: 999px; color: #94a3b8; }
+    .card {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.25);
+    }
+    .card-label { font-size: 12px; opacity: 0.85; }
+    .balance { font-size: 28px; font-weight: 700; margin: 6px 0 16px; }
+    .card-num { letter-spacing: 2px; font-size: 15px; opacity: 0.95; }
+    .box { background: #1e293b; border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+    .box h3 { font-size: 15px; margin-bottom: 12px; }
+    label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+    input {
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid #334155; background: #0f172a; color: #fff;
+      margin-bottom: 12px; font-size: 14px;
+    }
+    button {
+      width: 100%; padding: 12px; border: none; border-radius: 10px;
+      background: #0ea5e9; color: #fff; font-weight: 600; font-size: 15px;
+      cursor: pointer;
+    }
+    button:active { transform: scale(0.99); }
+    .msg { margin-top: 10px; font-size: 13px; min-height: 18px; color: #4ade80; }
+    .err { color: #f87171; }
+    .tx { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #334155; font-size: 13px; }
+    .tx:last-child { border-bottom: none; }
+    .minus { color: #f87171; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="logo">MaxmudBank</div>
+      <div class="badge">Demo / Simulyatsiya</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Joriy balans</div>
+      <div class="balance" id="balanceText">2 500 000 so'm</div>
+      <div class="card-num">8600 •••• •••• 4821</div>
+    </div>
+
+    <div class="box">
+      <h3>Kartadan kartaga o‘tkazma</h3>
+      <label for="toCard">Qabul qiluvchi karta (16 raqam)</label>
+      <input id="toCard" type="text" maxlength="19" placeholder="8600 0000 0000 0000" />
+
+      <label for="amount">Summa (so‘m)</label>
+      <input id="amount" type="number" min="100" placeholder="Masalan: 50000" />
+
+      <button onclick="sendMoney()">O‘tkazish</button>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <div class="box">
+      <h3>So‘nggi amallar</h3>
+      <div id="txList">
+        <div class="tx">
+          <span>Boshlang‘ich hisob</span>
+          <span>+2 500 000 so'm</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let balance = 2500000;
+
+    function fmt(n) {
+      return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " so'm";
+    }
+
+    function sendMoney() {
+      const cardRaw = document.getElementById("toCard").value.replace(/\s+/g, "");
+      const amt = Number(document.getElementById("amount").value);
+      const msg = document.getElementById("msg");
+
+      msg.className = "msg err";
+      if (cardRaw.length !== 16 || !/^\d+$/.test(cardRaw)) {
+        msg.textContent = "Karta raqamini 16 ta raqam kiriting.";
+        return;
+      }
+      if (!amt || amt <= 0) {
+        msg.textContent = "To‘g‘ri summa kiriting.";
+        return;
+      }
+      if (amt > balance) {
+        msg.textContent = "Balansda mablag‘ yetarli emas.";
+        return;
+      }
+
+      balance -= amt;
+      document.getElementById("balanceText").textContent = fmt(balance);
+
+      const masked = cardRaw.slice(0, 4) + " •••• " + cardRaw.slice(-4);
+      const txList = document.getElementById("txList");
+      const item = document.createElement("div");
+      item.className = "tx";
+      item.innerHTML = `<span>Karta ${masked}</span><span class="minus">-${fmt(amt)}</span>`;
+      txList.prepend(item);
+
+      document.getElementById("amount").value = "";
+      msg.className = "msg";
+      msg.textContent = "O‘tkazma muvaffaqiyatli bajarildi (demo).";
+    }
+  </script>
+</body>
+</html>
