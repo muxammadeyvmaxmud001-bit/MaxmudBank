@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MaxmudBank</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body {
+      margin: 0;
+      background: #0b1020;
+      color: #f8fafc;
+      padding: 16px 16px 84px;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .logo {
+      width: 42px; height: 42px; border-radius: 14px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px;
+    }
+    .title { font-size: 18px; font-weight: 700; }
+    .sub { font-size: 12px; color: #34d399; }
+    .card {
+      background: linear-gradient(135deg, #2563eb, #4338ca);
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.3);
+    }
+    .row-between { display: flex; justify-content: space-between; align-items: center; }
+    .badge {
+      background: rgba(255,255,255,0.18);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .balance-label { font-size: 13px; opacity: 0.9; margin-top: 14px; }
+    .balance { font-size: 28px; font-weight: 800; margin: 6px 0 16px; }
+    .btn-small {
+      background: rgba(255,255,255,0.2);
+      border: none; color: #fff;
+      padding: 8px 14px; border-radius: 12px;
+      font-weight: 600; cursor: pointer;
+    }
+    .grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 10px; margin-bottom: 20px;
+    }
+    .tile {
+      background: #131b31; border: 1px solid #1e293b;
+      border-radius: 16px; padding: 12px 6px;
+      text-align: center; font-size: 12px;
+    }
+    .box {
+      background: #131b31; border: 1px solid #1e293b;
+      border-radius: 20px; padding: 16px;
+    }
+    label { display: block; font-size: 13px; color: #94a3b8; margin: 10px 0 6px; }
+    input {
+      width: 100%; padding: 12px 14px; border-radius: 12px;
+      border: 1px solid #26334d; background: #0b1020;
+      color: #fff; font-size: 15px;
+    }
+    .chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .chip {
+      background: #1e293b; color: #e2e8f0; border: none;
+      padding: 8px 12px; border-radius: 10px; font-size: 12px; cursor: pointer;
+    }
+    .send-btn {
+      width: 100%; margin-top: 14px; padding: 13px;
+      border: none; border-radius: 14px;
+      background: #2563eb; color: #fff; font-weight: 700; font-size: 15px;
+      cursor: pointer;
+    }
+    .msg { margin-top: 10px; font-size: 13px; color: #34d399; min-height: 18px; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="logo">MB</div>
+    <div>
+      <div class="title">MaxmudBank</div>
+      <div class="sub">● Komissiya 0% • VIP Tarif</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row-between">
+      <div style="font-weight:700;font-size:13px;">MAXMUDBANK INFINITE • UZS</div>
+      <div class="badge">0% KOMISSIYA</div>
+    </div>
+    <div class="balance-label">Umumiy balans</div>
+    <div class="row-between">
+      <div class="balance" id="balanceText">9 000 999 000 so'm</div>
+      <button class="btn-small" onclick="toggleBalance()">Yashirish</button>
+    </div>
+    <div class="row-between" style="font-size:13px;opacity:0.9;">
+      <div>8600 49•• •••• 7701<br><small>MAXMUDJONOV MAXMUD</small></div>
+      <div>11/29</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="tile">💸<br>O'tkazma 0%</div>
+    <div class="tile">📷<br>Max QR</div>
+    <div class="tile">⚡<br>Kommunal</div>
+    <div class="tile">📊<br>Tahlil</div>
+  </div>
+
+  <div class="box">
+    <div class="row-between">
+      <strong>Kartadan kartaga o'tkazma</strong>
+      <span style="color:#34d399;font-size:12px;">Komissiya: 0%</span>
+    </div>
+    <label>Qabul qiluvchi karta raqami (16 raqam)</label>
+    <input id="cardInput" type="text" value="9860 1234 5678 9012" />
+    <label>O'tkazma summasi (so'm)</label>
+    <input id="amountInput" type="number" value="500000" />
+    <div class="chips">
+      <button class="chip" onclick="setAmt(100000)">100 000</button>
+      <button class="chip" onclick="setAmt(500000)">500 000</button>
+      <button class="chip" onclick="setAmt(1000000)">1 000 000</button>
+    </div>
+    <button class="send-btn" onclick="sendMoney()">O'tkazish</button>
+    <div class="msg" id="statusMsg"></div>
+  </div>
+
+  <script>
+    let bal = 9000999000;
+    let hidden = false;
+    function fmt(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " so'm"; }
+    function renderBal() {
+      document.getElementById("balanceText").textContent = hidden ? "• ••• ••• ••• so'm" : fmt(bal);
+    }
+    function toggleBalance() { hidden = !hidden; renderBal(); }
+    function setAmt(v) { document.getElementById("amountInput").value = v; }
+    function sendMoney() {
+      const v = Number(document.getElementById("amountInput").value || 0);
+      if (v <= 0 || v > bal) {
+        document.getElementById("statusMsg").textContent = "Summa noto'g'ri yoki balans yetarli emas.";
+        return;
+      }
+      bal -= v;
+      renderBal();
+      document.getElementById("statusMsg").textContent = fmt(v) + " muvaffaqiyatli o'tkazildi!";
+    }
+  </script>
+</body>
+</html>
