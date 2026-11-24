@@ -1,0 +1,237 @@
+name: Build MaxmudBank APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+
+      - name: Create full Flutter app
+        run: |
+          flutter create . --platforms=android --org com.maxmudbank --project-name maxmud_bank
+
+          cat << 'EOF' > pubspec.yaml
+          name: maxmud_bank
+          description: MaxmudBank simulated mobile banking application.
+          publish_to: 'none'
+          version: 1.0.0+1
+
+          environment:
+            sdk: '>=3.0.0 <4.0.0'
+
+          dependencies:
+            flutter:
+              sdk: flutter
+            cupertino_icons: ^1.0.8
+
+          dev_dependencies:
+            flutter_test:
+              sdk: flutter
+            flutter_lints: ^4.0.0
+
+          flutter:
+            uses-material-design: true
+          EOF
+
+          cat << 'EOF' > lib/main.dart
+          import 'package:flutter/material.dart';
+
+          void main() {
+            runApp(const MaxmudBankApp());
+          }
+
+          class MaxmudBankApp extends StatelessWidget {
+            const MaxmudBankApp({super.key});
+
+            @override
+            Widget build(BuildContext context) {
+              return MaterialApp(
+                title: 'MaxmudBank',
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0A66C2)),
+                  useMaterial3: true,
+                ),
+                home: const BankHomePage(),
+              );
+            }
+          }
+
+          class BankHomePage extends StatefulWidget {
+            const BankHomePage({super.key});
+
+            @override
+            State<BankHomePage> createState() => _BankHomePageState();
+          }
+
+          class _BankHomePageState extends State<BankHomePage> {
+            double balance = 4500000;
+            final List<String> history = [
+              'Boshlang‘ich balans: +4 500 000 so‘m',
+            ];
+
+            void _showTransferDialog() {
+              final amountController = TextEditingController();
+              final cardController = TextEditingController();
+
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Karta orqali o‘tkazma'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: cardController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Karta raqami (16 raqam)',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: amountController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Summa (so‘m)',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Bekor qilish'),
+                    ),
+                    FilledButton(
+                      onPressed: () {
+                        final amount = double.tryParse(amountController.text.trim()) ?? 0;
+                        final card = cardController.text.trim();
+                        if (amount > 0 && amount <= balance && card.isNotEmpty) {
+                          setState(() {
+                            balance -= amount;
+                            final last4 = card.length >= 4
+                                ? card.substring(card.length - 4)
+                                : card;
+                            history.insert(
+                              0,
+                              'O‘tkazma (**$last4): -${amount.toStringAsFixed(0)} so‘m',
+                            );
+                          });
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text('Yuborish'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: const Text('MaxmudBank'),
+                  centerTitle: true,
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF0A66C2), Color(0xFF1E88E5)],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Asosiy hisob balansi',
+                              style: TextStyle(color: Colors.white70, fontSize: 14),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${balance.toStringAsFixed(0)} so‘m',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              '•••• •••• •••• 8600',
+                              style: TextStyle(color: Colors.white, letterSpacing: 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      FilledButton.icon(
+                        onPressed: _showTransferDialog,
+                        icon: const Icon(Icons.send),
+                        label: const Text('Pul o‘tkazish'),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Tranzaksiyalar tarixi',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: history.length,
+                          itemBuilder: (context, index) => Card(
+                            child: ListTile(
+                              leading: const Icon(Icons.receipt_long),
+                              title: Text(history[index]),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }
+          EOF
+
+      - name: Build APK
+        run: |
+          flutter pub get
+          flutter build apk --debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MaxmudBank-APK
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          
