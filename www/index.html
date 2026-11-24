@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>MaxmudBank</title>
+  <style>
+    :root {
+      --bg: #070b16;
+      --surface: #11182c;
+      --surface-2: #18223d;
+      --text: #f3f6ff;
+      --muted: #98a6c7;
+      --accent: #2563eb;
+      --green: #22c55e;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top, #132042 0%, var(--bg) 60%);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+    }
+    .app { width: 100%; max-width: 460px; padding: 14px 14px 86px; display: flex; flex-direction: column; gap: 12px; }
+    .top { display: flex; justify-content: space-between; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      display: grid; place-items: center; font-weight: 800;
+    }
+    .title { font-weight: 700; font-size: 16px; }
+    .sub { font-size: 12px; color: var(--muted); }
+    .btn-sm {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 7px 11px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .card {
+      background: linear-gradient(135deg, #2563eb 0%, #3730a3 58%, #0f172a 100%);
+      border: 1px solid rgba(255,255,255,0.16); border-radius: 20px; padding: 18px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .card-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; }
+    .badge { background: rgba(34,197,94,0.22); color: #dcfce7; padding: 4px 10px; border-radius: 999px; font-size: 11px; }
+    .bal-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .bal-val { font-size: 24px; font-weight: 800; margin-top: 4px; }
+    .hide-btn {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; border-radius: 10px; padding: 8px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .card-bot { display: flex; justify-content: space-between; font-size: 12px; opacity: 0.92; }
+    .card-num { font-family: monospace; font-size: 14px; letter-spacing: 1.5px; margin-bottom: 4px; }
+    .quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .q-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 11px 6px; color: var(--text); font-size: 12px; font-weight: 600;
+      display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer;
+    }
+    .panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+      padding: 15px; display: flex; flex-direction: column; gap: 11px;
+    }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; }
+    .panel h2 { margin: 0; font-size: 15px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .input, .select {
+      width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 10px; padding: 11px; font-size: 14px; outline: none;
+    }
+    .presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .p-btn {
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .primary {
+      width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none;
+      color: #fff; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .tx-list { display: flex; flex-direction: column; gap: 8px; }
+    .tx {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; cursor: pointer;
+    }
+    .tx-t { font-size: 13px; font-weight: 700; }
+    .tx-m { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .tx-a { font-size: 13px; font-weight: 800; color: #f87171; white-space: nowrap; }
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 11px; }
+    .stat small { color: var(--muted); font-size: 11px; display: block; }
+    .stat strong { font-size: 14px; margin-top: 4px; display: block; }
+    .nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 460px; background: rgba(11,16,32,0.95);
+      border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr);
+      padding: 8px 6px 12px; gap: 4px; z-index: 20;
+    }
+    .n-btn {
+      background: none; border: none; color: var(--muted); font-size: 11px; font-weight: 700;
+      display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px; border-radius: 10px; cursor: pointer;
+    }
+    .n-btn.active { color: #fff; background: rgba(37,99,235,0.2); }
+    .hidden { display: none !important; }
+    .modal {
+      position: fixed; inset: 0; background: rgba(2,6,17,0.78);
+      display: flex; align-items: center; justify-content: center; padding: 14px; z-index: 50;
+    }
+    .receipt {
+      width: 100%; max-width: 410px; max-height: 90dvh; overflow-y: auto;
+      background: #f8fafc; color: #0f172a; border-radius: 18px; padding: 16px;
+      transition: max-width 0.15s ease, font-size 0.15s ease;
+    }
+    .receipt.zoom { max-width: 98vw; font-size: 1.08rem; }
+    .r-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #cbd5e1; padding-bottom: 10px; }
+    .r-bank { font-weight: 800; color: #1d4ed8; }
+    .r-ok { font-size: 11px; font-weight: 800; color: #15803d; background: #dcfce7; padding: 3px 9px; border-radius: 999px; }
+    .r-sum { text-align: center; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; margin-bottom: 8px; }
+    .r-amt { font-size: 22px; font-weight: 900; margin-top: 3px; }
+    .r-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #e2e8f0; }
+    .r-row span:first-child { color: #475569; }
+    .r-row span:last-child { font-weight: 700; text-align: right; }
+    .r-acts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .r-btn { border: 1px solid #cbd5e1; background: #fff; color: #0f172a; border-radius: 10px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .r-btn.pri { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <div class="brand">
+        <div class="logo">MB</div>
+        <div>
+          <div class="title">MaxmudBank</div>
+          <div class="sub">Komissiya 0% • VIP Tarif</div>
+        </div>
+      </div>
+      <button class="btn-sm" id="resetBtn" type="button">Tiklash</button>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span>MAXMUDBANK INFINITE • UZS</span>
+        <span class="badge">0% KOMISSIYA</span>
+      </div>
+      <div class="bal-row">
+        <div>
+          <div class="sub" style="color:#dbeafe;">Umumiy balans</div>
+          <div class="bal-val" id="balText">9 000 999 000 so'm</div>
+        </div>
+        <button class="hide-btn" id="hideBtn" type="button">Yashirish</button>
+      </div>
+      <div class="card-bot">
+        <div>
+          <div class="card-num">8600 49•• •••• 7701</div>
+          <div>MAXMUDJONOV MAXMUD</div>
+        </div>
+        <div>11/29</div>
+      </div>
+    </div>
+
+    <div class="quick">
+      <button class="q-btn" data-go="home" type="button"><span>💸</span><span>O'tkazma</span></button>
+      <button class="q-btn" data-go="pay" type="button"><span>📷</span><span>Max QR</span></button>
+      <button class="q-btn" data-go="pay" type="button"><span>⚡</span><span>Kommunal</span></button>
+      <button class="q-btn" data-go="stats" type="button"><span>📊</span><span>Tahlil</span></button>
+    </div>
+
+    <div id="sec-home">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Kartadan kartaga o'tkazma</h2>
+          <span class="badge">0%</span>
+        </div>
+        <form id="trForm" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="field">
+            <label for="rName">Qabul qiluvchi ismi (F.I.O)</label>
+            <input class="input" id="rName" type="text" placeholder="Masalan: Azizbek Karimov" />
+          </div>
+          <div class="field">
+            <label for="rCard">Qabul qiluvchi karta raqami</label>
+            <input class="input" id="rCard" type="text" inputmode="numeric" maxlength="19" value="9860 1234 5678 9012" />
+          </div>
+          <div class="field">
+            <label for="rAmt">Summa (so'm)</label>
+            <input class="input" id="rAmt" type="number" min="100" value="500000" />
+          </div>
+          <div class="presets">
+            <button class="p-btn" data-p="100000" type="button">100 000</button>
+            <button class="p-btn" data-p="500000" type="button">500 000</button>
+            <button class="p-btn" data-p="1000000" type="button">1 000 000</button>
+          </div>
+          <button class="primary" type="submit">O'tkazish va chek olish</button>
+        </form>
+      </div>
+
+      <div class="panel" style="margin-top:10px;">
+        <div class="panel-head">
+          <h2>So'nggi amallar</h2>
+          <button class="btn-sm" id="toHistBtn" type="button">Tarix</button>
+        </div>
+        <div class="tx-list" id="recentList"></div>
+      </div>
+    </div>
+
+    <div id="sec-pay" class="hidden">
+      <div class="panel">
+        <h2>Max QR to'lov</h2>
+        <form id="qrForm" style="display:flex;flex-direction:column;gap:9px;">
+          <input class="input" id="qrShop" type="text" value="Maxmud Market #1" required />
+          <input class="input" id="qrSum" type="number" min="100" value="75000" required />
+          <button class="primary" type="submit">QR to'lov qilish</button>
+        </form>
+      </div>
+      <div class="panel" style="margin-top:10px;">
+        <h2>Kommunal to'lov</h2>
+        <form id="utForm" style="display:flex;flex-direction:column;gap:9px;">
+          <select class="select" id="utSrv">
+            <option>Elektr energiyasi (HET)</option>
+            <option>Tabiiy gaz (Hududgaz)</option>
+            <option>Ichimlik suvi</option>
+            <option>Internet va TV</option>
+          </select>
+          <input class="input" id="utAcc" type="text" value="10482910" required />
+          <input class="input" id="utSum" type="number" min="100" value="120000" required />
+          <button class="primary" type="submit">Kommunal to'lov qilish</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="sec-hist" class="hidden">
+      <div class="panel">
+        <h2>Tarix</h2>
+        <div class="tx-list" id="fullList"></div>
+      </div>
+    </div>
+
+    <div id="sec-stats" class="hidden">
+      <div class="panel">
+        <h2>Tahlil</h2>
+        <div class="stats">
+          <div class="stat"><small>Jami chiqim</small><strong id="stOut">0 so'm</strong></div>
+          <div class="stat"><small>Amallar soni</small><strong id="stCnt">0</strong></div>
+          <div class="stat"><small>O'tkazmalar</small><strong id="stTr">0 so'm</strong></div>
+          <div class="stat"><small>QR / Kommunal</small><strong id="stPay">0 so'm</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="n-btn active" data-tab="home" type="button"><span>🏠</span><span>Asosiy</span></button>
+    <button class="n-btn" data-tab="pay" type="button"><span>💳</span><span>To'lov</span></button>
+    <button class="n-btn" data-tab="hist" type="button"><span>📜</span><span>Tarix</span></button>
+    <button class="n-btn" data-tab="stats" type="button"><span>📈</span><span>Tahlil</span></button>
+  </nav>
+
+  <div id="modal" class="modal hidden">
+    <div id="receipt" class="receipt">
+      <div class="r-head">
+        <span class="r-bank">MAXMUDBANK • CHEK</span>
+        <span class="r-ok">TO'LANDI</span>
+      </div>
+      <div class="r-sum">
+        <div id="rType" style="font-size:12px;color:#475569;">O'tkazma</div>
+        <div class="r-amt" id="rBigAmt">0 so'm</div>
+      </div>
+      <div id="rBody"></div>
+      <div class="r-acts">
+        <button class="r-btn" id="zoomBtn" type="button">Kattalashtirish</button>
+        <button class="r-btn" id="copyBtn" type="button">Nusxalash</button>
+        <button class="r-btn pri" id="closeBtn" type="button">Yopish</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const KEY = "maxmudbank_app_v3";
+    const INIT_BAL = 9000999000;
+    let state = { bal: INIT_BAL, hide: false, txs: [] };
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || "null");
+      if (saved && typeof saved.bal === "number") state = saved;
+    } catch (_) {}
+
+    let curTx = null;
+    const fmt = (n) => Math.round(Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} };
+
+    function renderBal() {
+      document.getElementById("balText").textContent = state.hide ? "• • • • • • • so'm" : fmt(state.bal) + " so'm";
+      document.getElementById("hideBtn").textContent = state.hide ? "Ko'rsatish" : "Yashirish";
+    }
+
+    function openReceipt(tx) {
+      curTx = tx;
+      document.getElementById("rType").textContent = tx.type;
+      document.getElementById("rBigAmt").textContent = fmt(tx.amt) + " so'm";
+      const rows = [
+        ["Chek ID", tx.id],
+        ["Sana", tx.date],
+        ["Yuboruvchi", "MAXMUDJONOV MAXMUD (8600 49•• •••• 7701)"],
+        ["Qabul qiluvchi", tx.who],
+        ["Ma'lumot", tx.info],
+        ["Komissiya", "0 so'm"]
+      ];
+      document.getElementById("rBody").innerHTML = rows.map(([k, v]) => `<div class="r-row"><span>${k}</span><span>${v}</span></div>`).join("");
+      document.getElementById("receipt").classList.remove("zoom");
+      document.getElementById("zoomBtn").textContent = "Kattalashtirish";
+      document.getElementById("modal").classList.remove("hidden");
+    }
+
+    function renderLists() {
+      const make = (tx) => {
+        const d = document.createElement("div");
+        d.className = "tx";
+        d.innerHTML = `<div><div class="tx-t">${tx.who}</div><div class="tx-m">${tx.info} • ${tx.date}</div></div><div class="tx-a">-${fmt(tx.amt)} so'm</div>`;
+        d.onclick = () => openReceipt(tx);
+        return d;
+      };
+      const rec = document.getElementById("recentList");
+      const full = document.getElementById("fullList");
+      rec.innerHTML = "";
+      full.innerHTML = "";
+      if (!state.txs.length) {
+        rec.innerHTML = `<div class="tx-m">Hali amal bajarilmagan.</div>`;
+        full.innerHTML = `<div class="tx-m">Tarix bo'sh.</div>`;
+      } else {
+        state.txs.slice(0, 3).forEach((t) => rec.appendChild(make(t)));
+        state.txs.forEach((t) => full.appendChild(make(t)));
+      }
+      let out = 0, tr = 0, pay = 0;
+      state.txs.forEach((t) => { out += t.amt; if (t.kind === "tr") tr += t.amt; else pay += t.amt; });
+      document.getElementById("stOut").textContent = fmt(out) + " so'm";
+      document.getElementById("stCnt").textContent = String(state.txs.length);
+      document.getElementById("stTr").textContent = fmt(tr) + " so'm";
+      document.getElementById("stPay").textContent = fmt(pay) + " so'm";
+    }
+
+    function addTx(kind, type, who, info, amt) {
+      const n = Math.round(Number(amt));
+      if (!n || n <= 0 || n > state.bal) return;
+      state.bal -= n;
+      const now = new Date();
+      const tx = {
+        id: "MB" + Math.floor(1000000 + Math.random() * 9000000),
+        kind, type, who, info, amt: n,
+        date: now.toLocaleDateString("uz-UZ") + " " + now.toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" })
+      };
+      state.txs.unshift(tx);
+      save(); renderBal(); renderLists(); openReceipt(tx);
+    }
+
+    function goTab(tab) {
+      ["home", "pay", "hist", "stats"].forEach((s) => document.getElementById("sec-" + s).classList.toggle("hidden", s !== tab));
+      document.querySelectorAll(".n-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+    }
+
+    document.getElementById("hideBtn").onclick = () => { state.hide = !state.hide; save(); renderBal(); };
+    document.getElementById("resetBtn").onclick = () => { state = { bal: INIT_BAL, hide: false, txs: [] }; save(); renderBal(); renderLists(); };
+    document.querySelectorAll(".n-btn").forEach((b) => (b.onclick = () => goTab(b.dataset.tab)));
+    document.querySelectorAll(".q-btn").forEach((b) => (b.onclick = () => goTab(b.dataset.go)));
+    document.getElementById("toHistBtn").onclick = () => goTab("hist");
+    document.querySelectorAll(".p-btn").forEach((b) => (b.onclick = () => { document.getElementById("rAmt").value = b.dataset.p; }));
+
+    document.getElementById("rCard").addEventListener("input", (e) => {
+      const d = e.target.value.replace(/\D/g, "").slice(0, 16);
+      e.target.value = d.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+    });
+
+    document.getElementById("trForm").onsubmit = (e) => {
+      e.preventDefault();
+      const name = document.getElementById("rName").value.trim() || "KARTA EGASI";
+      const card = document.getElementById("rCard").value.trim() || "9860 1234 5678 9012";
+      addTx("tr", "Kartadan kartaga o'tkazma", name, card, document.getElementById("rAmt").value);
+    };
+
+    document.getElementById("qrForm").onsubmit = (e) => {
+      e.preventDefault();
+      addTx("qr", "Max QR to'lov", document.getElementById("qrShop").value.trim() || "Max QR", "QR-kod", document.getElementById("qrSum").value);
+    };
+
+    document.getElementById("utForm").onsubmit = (e) => {
+      e.preventDefault();
+      const srv = document.getElementById("utSrv").value;
+      addTx("ut", "Kommunal to'lov", srv, "Hisob: " + document.getElementById("utAcc").value.trim(), document.getElementById("utSum").value);
+    };
+
+    document.getElementById("zoomBtn").onclick = () => {
+      const z = document.getElementById("receipt").classList.toggle("zoom");
+      document.getElementById("zoomBtn").textContent = z ? "Kichraytirish" : "Kattalashtirish";
+    };
+
+    document.getElementById("copyBtn").onclick = () => {
+      if (!curTx) return;
+      const txt = `MAXMUDBANK CHEK\nID: ${curTx.id}\nSumma: ${fmt(curTx.amt)} so'm\nKimga: ${curTx.who}\n${curTx.date}`;
+      navigator.clipboard?.writeText(txt).catch(() => {});
+    };
+
+    document.getElementById("closeBtn").onclick = () => document.getElementById("modal").classList.add("hidden");
+    renderBal(); renderLists();
+  </script>
+</body>
+              </html>
+              
