@@ -17,16 +17,17 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+      - uses: android-actions/setup-android@v3
       - run: |
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
           npx cap init MaxmudBank com.maxmudbank.sim --web-dir www
           npx cap add android
           npx cap sync android
       - run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: MaxmudBank-debug-apk
